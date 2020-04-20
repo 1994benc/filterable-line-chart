@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import styles from './styles.module.css'
 import useResizeObserver from 'use-resize-observer/polyfilled'
 import _ from 'lodash'
+import usePrevious from './usePrevious.js'
 import {
   select,
   extent,
@@ -12,7 +13,10 @@ import {
   curveBasis,
   curveCardinal,
   curveLinear,
-  curveCatmullRom
+  curveCatmullRom,
+  brushX,
+  event,
+  easeBounce
 } from 'd3'
 
 const curves = {
@@ -38,6 +42,8 @@ export const FilterableLineChart = ({
   const [translateYLabel, settranslateYLabel] = useState(0)
   const [xKey, setxKey] = useState('')
   const [yKey, setyKey] = useState('')
+  const [selection, setselection] = useState([1.999, 2.2])
+  const previousSelection = usePrevious(selection)
   const svgRef = useRef()
 
   const { ref } = useResizeObserver({
@@ -109,8 +115,30 @@ export const FilterableLineChart = ({
       .attr('class', 'point')
       .attr('cx', (d) => xScale(parseFloat(d[xKey])))
       .attr('cy', (d) => yScale(parseFloat(d[yKey])))
-      .attr('fill', 'blue')
-      .attr('r', 5)
+      .transition()
+      .duration(200)
+      .ease(easeBounce)
+      .attr('fill', (d) => {
+        if (
+          selection[0] < parseFloat(d[xKey]) &&
+          selection[1] > parseFloat(d[xKey])
+        ) {
+          return 'red'
+        } else {
+          return 'blue'
+        }
+      })
+      .attr('r', (d) => {
+        if (
+          selection[0] < parseFloat(d[xKey]) &&
+          selection[1] > parseFloat(d[xKey])
+        ) {
+          return 7
+        } else {
+          return 4
+        }
+      })
+      .attr('opacity', 0.7)
 
     // axises
     const yAxis = axisLeft(yScale)
@@ -145,6 +173,29 @@ export const FilterableLineChart = ({
     if (showRegLine) {
       // TODO: regline
     }
+
+    // brush
+    const brush = brushX()
+      .extent([
+        [-1, -1],
+        [width + 1, height + 1]
+      ])
+      .on('start brush end', () => {
+        const indexSelection =
+          event && event.selection && event.selection.map(xScale.invert)
+        console.log(indexSelection)
+        if (
+          indexSelection &&
+          !isNaN(indexSelection[0]) &&
+          !isNaN(indexSelection[1])
+        ) {
+          setselection([...indexSelection])
+          // console.log(indexSelection)
+        }
+      })
+    if (previousSelection === selection) {
+      svg.select('.brush').call(brush).call(brush.move, selection.map(xScale))
+    }
   }, [
     sortedDataset,
     width,
@@ -153,7 +204,8 @@ export const FilterableLineChart = ({
     yKey,
     showLine,
     showRegLine,
-    translateYLabel
+    translateYLabel,
+    selection
   ])
 
   return (
@@ -169,6 +221,7 @@ export const FilterableLineChart = ({
       <svg className={styles.svg} width='100%' height='100%' ref={svgRef}>
         <g className='xaxis' />
         <g className='yaxis' />
+        <g className='brush' />
       </svg>
     </div>
   )
