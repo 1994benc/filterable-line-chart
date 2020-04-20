@@ -183,7 +183,6 @@ export const FilterableLineChart = ({
       .on('start brush end', () => {
         const indexSelection =
           event && event.selection && event.selection.map(xScale.invert)
-        console.log(indexSelection)
         if (
           indexSelection &&
           !isNaN(indexSelection[0]) &&
