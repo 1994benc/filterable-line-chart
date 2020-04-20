@@ -9,6 +9,9 @@ build
 dist
 .rpt2_cache
 
+#examples
+example/src/never_commit
+
 # misc
 .DS_Store
 .env
