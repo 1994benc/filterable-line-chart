@@ -214,7 +214,7 @@ export const FilterableLineChart = ({
       style={{
         width: '100%',
         height: height,
-        position: 'absolute'
+        position: 'relative'
       }}
       className={styles.wrapper}
     >
@@ -223,6 +223,26 @@ export const FilterableLineChart = ({
         <g className='yaxis' />
         <g className='brush' />
       </svg>
+      <div
+        style={{ position: 'absolute', left: '50%', bottom: '1rem' }}
+        className='xlab'
+      >
+        {xKey}
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: `${5 + translateYLabel}rem`,
+          transform: 'rotate(-90deg)'
+        }}
+        className='ylab'
+      >
+        {yKey}
+      </div>
+      <div className={styles.selection}>
+        {selection[0].toFixed(2)} - {selection[1].toFixed(2)}
+      </div>
     </div>
   )
 }
