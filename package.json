@@ -1,6 +1,6 @@
 {
   "name": "@benchomsang/filterable-line-chart",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A VisSpot chart template: a filterable line chart that allows users to filter a portion of the chart",
   "author": "1994benc",
   "license": "MIT",

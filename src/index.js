@@ -66,20 +66,21 @@ export const FilterableLineChart = ({
     }
     // Settings
     const heightV = _.find(settings, ['id', 'height'])?.value
-    heightV && setheight((d) => heightV)
+    setheight((d) => heightV)
 
     const showRegLineV = _.find(settings, ['id', 'show_reg_line'])?.value
-    showRegLineV && setshowRegLine((d) => showRegLineV)
+    setshowRegLine((d) => showRegLineV)
 
     const showLineV = _.find(settings, ['id', 'show_line'])?.value
-    showLineV && setshowLine((d) => showLineV)
+    setshowLine((d) => showLineV)
+    console.log(showLineV)
 
     const curveTypeV = _.find(settings, ['id', 'curve_type'])?.value
-    curveTypeV && setcurveType((d) => curveTypeV)
+    setcurveType((d) => curveTypeV)
 
     const translateYLabelV = _.find(settings, ['id', 'translate_y_label'])
       ?.value
-    translateYLabelV && settranslateYLabel((d) => translateYLabelV)
+    settranslateYLabel((d) => translateYLabelV)
 
     // Data options
     const xV = _.find(dataOptions, ['id', 'x'])?.value
@@ -217,7 +218,8 @@ export const FilterableLineChart = ({
     showLine,
     showRegLine,
     translateYLabel,
-    selection
+    selection,
+    curveType
   ])
 
   return (
