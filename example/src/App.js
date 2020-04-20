@@ -61,7 +61,7 @@ const settings = [
       "rangeEnd": "500",
       "rangeStart": "-500",
       "type": "number",
-      "value": 0
+      "value": 2
   }
 ]
 

@@ -1,9 +1,17 @@
-/* add css module styles here (optional) */
+@import url('https://rsms.me/inter/inter.css');
 
 .wrapper {
+  font-family: 'Inter', serif;
 }
 
 .svg {
   overflow: visible !important;
   transform: scale(0.75);
+  font-family: 'Inter', serif;
+}
+
+.selection {
+  text-align: center;
+  font-weight: 200;
+  font-family: 'Inter', serif;
 }
