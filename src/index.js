@@ -16,7 +16,9 @@ import {
   curveCatmullRom,
   brushX,
   event,
-  easeBounce
+  easeBounce,
+  quantile,
+  min
 } from 'd3'
 
 const curves = {
@@ -42,7 +44,7 @@ export const FilterableLineChart = ({
   const [translateYLabel, settranslateYLabel] = useState(0)
   const [xKey, setxKey] = useState('')
   const [yKey, setyKey] = useState('')
-  const [selection, setselection] = useState([1.999, 2.2])
+  const [selection, setselection] = useState([2, 2.2])
   const previousSelection = usePrevious(selection)
   const svgRef = useRef()
 
@@ -64,26 +66,26 @@ export const FilterableLineChart = ({
     }
     // Settings
     const heightV = _.find(settings, ['id', 'height'])?.value
-    heightV && setheight(heightV)
+    heightV && setheight((d) => heightV)
 
     const showRegLineV = _.find(settings, ['id', 'show_reg_line'])?.value
-    showRegLineV && setshowRegLine(showRegLineV)
+    showRegLineV && setshowRegLine((d) => showRegLineV)
 
     const showLineV = _.find(settings, ['id', 'show_line'])?.value
-    showLineV && setshowLine(showLineV)
+    showLineV && setshowLine((d) => showLineV)
 
     const curveTypeV = _.find(settings, ['id', 'curve_type'])?.value
-    curveTypeV && setcurveType(curveTypeV)
+    curveTypeV && setcurveType((d) => curveTypeV)
 
     const translateYLabelV = _.find(settings, ['id', 'translate_y_label'])
       ?.value
-    translateYLabelV && settranslateYLabel(translateYLabelV)
+    translateYLabelV && settranslateYLabel((d) => translateYLabelV)
 
     // Data options
     const xV = _.find(dataOptions, ['id', 'x'])?.value
-    setxKey(xV)
+    setxKey((d) => xV)
     const yV = _.find(dataOptions, ['id', 'y'])?.value
-    setyKey(yV)
+    setyKey((d) => yV)
   }, [settings, dataOptions])
 
   // Sorted the dataset by x axis
@@ -91,13 +93,25 @@ export const FilterableLineChart = ({
     if (!dataset || !xKey || !yKey) {
       return
     }
-    const sorted = _.orderBy(dataset, [xKey], ['asc'])
+    const convertedDataset = _.map(dataset, (d) => {
+      let newX = parseFloat(d[xKey])
+      let newY = parseFloat(d[yKey])
+
+      let newd = d
+      newd[xKey] = newX
+      newd[yKey] = newY
+      return newd
+    })
+    const sorted = _.orderBy(convertedDataset, [xKey], ['asc'])
+
+    // let xs = _.map(sorted, (d) => d[xKey])
+
     setsortedDataset([...sorted])
   }, [dataset, xKey, yKey])
 
   // Render chart
   useEffect(() => {
-    if (!dataset || !sortedDataset || !width || !height || !yKey || !xKey) {
+    if (!dataset || !sortedDataset || sortedDataset.length <= 0 || !width || !height || !yKey || !xKey) {
       return
     }
     const xs = _.map(sortedDataset, (item) => parseFloat(item[xKey]))
@@ -189,11 +203,10 @@ export const FilterableLineChart = ({
           !isNaN(indexSelection[1])
         ) {
           setselection([...indexSelection])
-          // console.log(indexSelection)
         }
       })
     if (previousSelection === selection) {
-      svg.select('.brush').call(brush).call(brush.move, selection.map(xScale))
+      svg.select('.brush').call(brush).call(brush.move, [min(xs), quantile(xs, 0.10)].map(xScale))
     }
   }, [
     sortedDataset,
